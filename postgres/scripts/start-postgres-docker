@@ -1,0 +1,9 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+docker stop local-postgres >/dev/null 2>&1
+docker build -t "local-postgres-img" -f $DIR/../Dockerfile $DIR/../ && \
+    docker run -d --rm \
+    -p 5432:5432 \
+    --name "local-postgres" \
+    local-postgres-img

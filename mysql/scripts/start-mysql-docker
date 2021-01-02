@@ -1,0 +1,24 @@
+#!/bin/bash
+
+IMAGE="mysql"
+VERSION="8"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.."
+DATADIR="${DIR}/local/data/"
+MYSQL_ROOT_PWD="I@mR00t"
+MYSQL_DB="my_db"
+MYSQL_USER="user"
+MYSQL_PWD="Password1!"
+
+mkdir -p ${DATADIR}
+chmod -R +x ${DIR}
+
+docker stop local-mysql >/dev/null 2>&1
+docker run -d --rm \
+  --name local-mysql \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PWD}" \
+  -e MYSQL_DATABASE=${MYSQL_DB} \
+  -e MYSQL_USER=${MYSQL_USER} \
+  -e MYSQL_PASSWORD="${MYSQL_PWD}" \
+  -v ${DATADIR}:/var/lib/mysql \
+  ${IMAGE}:${VERSION}

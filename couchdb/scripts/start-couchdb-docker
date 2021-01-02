@@ -1,0 +1,38 @@
+#!/bin/bash
+set -ex
+
+IMAGE="apache/couchdb"
+VERSION="3.1.1"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.."
+DATADIR="${DIR}/local/data"
+CFGDIR="${DIR}/local/etc"
+LOGDIR="${DIR}/local/logs"
+
+mkdir -p ${DATADIR}
+mkdir -p ${CFGDIR}
+mkdir -p ${LOGDIR}
+
+chmod -R +x ${DIR}
+
+cat > ${CFGDIR}/local-docker.ini << EOF
+[couchdb]
+single_node=true
+
+[log]
+writer = file
+file = /opt/couchdb/log/couch.log
+level = debug
+; write_buffer = 0
+; write_delay = 0
+EOF
+
+docker stop local-couchdb >/dev/null 2>&1
+docker run -d --rm \
+  --name local-couchdb \
+  -p 5984:5984 \
+  -e COUCHDB_USER=admin \
+  -e COUCHDB_PASSWORD=password \
+  -v ${DATADIR}:/opt/couchdb/data \
+  -v ${CFGDIR}:/opt/couchdb/etc/local.d \
+  -v ${LOGDIR}:/opt/couchdb/log \
+  ${IMAGE}:${VERSION}
