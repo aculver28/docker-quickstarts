@@ -1,0 +1,18 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+IMAGE="cockroachdb/cockroach"
+VERSION="latest-v20.2"
+DATADIR="${DIR}/local/data/"
+
+mkdir -p ${DATADIR}
+chmod -R +x ${DIR}
+
+docker stop local-crdb >/dev/null 2>&1
+docker run -d --rm \
+    --name=local-crdb \
+    -p 26257:26257 -p 8080:8080  \
+    -v ${DATADIR}:/cockroach/cockroach-data  \
+    ${IMAGE}:${VERSION} start-single-node \
+    --insecure \
+    --logtostderr=INFO
